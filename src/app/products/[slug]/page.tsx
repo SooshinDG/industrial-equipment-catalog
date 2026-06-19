@@ -16,6 +16,10 @@ import { ProductCard } from "@/components/ProductCard";
 
 type Params = Promise<{ slug: string }>;
 
+// CSV가 유일한 데이터 소스이므로 빌드 시 모든 제품을 생성하고,
+// 목록에 없는 slug는 정식 404(not-found)로 처리한다.
+export const dynamicParams = false;
+
 export async function generateStaticParams() {
   const products = await getAllProducts();
   return products.map((p) => ({ slug: p.slug }));
