@@ -26,32 +26,20 @@ export function formatPower(kw: number): string {
 
 export interface StockBadgeStyle {
   label: StockStatus;
-  /** Tailwind 클래스 (배경/글자/테두리) */
-  className: string;
+  /** 상태 표시용 도트 색 (Tailwind 배경 클래스) */
+  dot: string;
 }
 
-/** 재고 상태별 배지 스타일 구분 */
+/** 재고 상태별 표시 — 색 면이 아닌 상태 도트로 구분(차분한 모노 배지) */
 export function getStockBadge(status: StockStatus): StockBadgeStyle {
   switch (status) {
     case "재고 있음":
-      return {
-        label: status,
-        className: "bg-emerald-50 text-emerald-700 border-emerald-200",
-      };
+      return { label: status, dot: "bg-emerald-500" };
     case "주문 생산":
-      return {
-        label: status,
-        className: "bg-amber-50 text-amber-700 border-amber-200",
-      };
+      return { label: status, dot: "bg-amber-500" };
     case "입고 예정":
-      return {
-        label: status,
-        className: "bg-sky-50 text-sky-700 border-sky-200",
-      };
+      return { label: status, dot: "bg-sky-500" };
     default:
-      return {
-        label: status,
-        className: "bg-brand-50 text-brand-600 border-brand-200",
-      };
+      return { label: status, dot: "bg-brand-300" };
   }
 }

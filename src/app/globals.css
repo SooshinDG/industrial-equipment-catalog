@@ -8,12 +8,13 @@
   }
 
   body {
-    @apply bg-white text-brand-800 antialiased;
+    /* 웜화이트 종이 바탕 위에 잉크 톤 텍스트 — 편집형 카탈로그 기본 분위기. */
+    @apply bg-paper text-brand-900 antialiased;
   }
 
   /* Visible, consistent keyboard focus across interactive elements. */
   :where(a, button, input, select, textarea, [tabindex]):focus-visible {
-    @apply outline-none ring-2 ring-accent-500 ring-offset-2 ring-offset-white rounded-sm;
+    @apply outline-none ring-2 ring-accent-500 ring-offset-2 ring-offset-paper rounded-sm;
   }
 }
 
@@ -22,19 +23,47 @@
     @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
   }
 
+  /* --- 버튼: 사용성을 위해 약간의 radius(6px)와 충분한 터치 영역 유지 --- */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-md bg-accent-500 px-5 py-2.5 text-sm font-semibold text-brand-900 transition-colors hover:bg-accent-400 disabled:cursor-not-allowed disabled:opacity-60;
+    @apply inline-flex min-h-[2.75rem] items-center justify-center gap-2 rounded-md bg-accent-500 px-5 py-2.5 text-sm font-semibold text-brand-900 transition-colors hover:bg-accent-400 disabled:cursor-not-allowed disabled:opacity-60;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-md border border-brand-200 bg-white px-5 py-2.5 text-sm font-semibold text-brand-700 transition-colors hover:border-brand-300 hover:bg-brand-50;
+    @apply inline-flex min-h-[2.75rem] items-center justify-center gap-2 rounded-md border border-brand-300 bg-white px-5 py-2.5 text-sm font-semibold text-brand-700 transition-colors hover:border-brand-400 hover:bg-brand-50;
   }
 
+  /* --- 폼 --- */
   .field-label {
     @apply mb-1.5 block text-sm font-medium text-brand-700;
   }
 
   .field-input {
-    @apply w-full rounded-md border border-brand-200 bg-white px-3 py-2 text-sm text-brand-800 placeholder:text-brand-300 focus:border-accent-400;
+    @apply min-h-[2.75rem] w-full rounded-md border border-brand-300 bg-white px-3 py-2 text-sm text-brand-800 placeholder:text-brand-300 focus:border-accent-400;
+  }
+
+  /* --- 산업 카탈로그 표면: 각진(2px) 카드와 hairline 괘선 --- */
+  .surface-card {
+    @apply rounded-sm border border-brand-200 bg-white;
+  }
+
+  /* 섹션/항목을 가르는 1px 괘선 (데이터시트 감각) */
+  .rule {
+    @apply border-brand-200;
+  }
+
+  /* 작은 사각 메타 태그 (pill 아님 — 코드/분류 라벨용) */
+  .tag {
+    @apply inline-flex items-center rounded-sm border border-brand-200 bg-brand-50 px-2 py-0.5 text-[11px] font-medium text-brand-600;
+  }
+
+  /* 카테고리/메타 라벨: 영문 대문자·과도한 자간 없이 작고 차분하게 */
+  .eyebrow {
+    @apply text-[11px] font-medium tracking-tight text-brand-400;
+  }
+
+  /* 기술 수치/코드: 등폭 + tabular-nums 로 비교를 쉽게 */
+  .num {
+    @apply font-mono tabular-nums;
+    font-feature-settings: "tnum" 1;
   }
 }

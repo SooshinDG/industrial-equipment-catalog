@@ -19,52 +19,61 @@ export interface CategoryMeta {
   /** URL/필터에 쓰는 안정적인 식별자 */
   slug: string;
   icon: LucideIcon;
-  /** Tailwind gradient/배경 클래스 (컬러 블록 비주얼용) */
+  /** 카탈로그 분류 코드 (라벨 플레이트·인덱스용, 예: AC·MG) */
+  code: string;
+  /** 비주얼 배경 클래스 (모노크롬 — 카테고리별 색 구분은 두지 않는다) */
   block: string;
-  /** 아이콘/텍스트 강조 색 */
+  /** 아이콘/텍스트 강조 색 (모노크롬 잉크 톤) */
   accent: string;
   blurb: string;
 }
 
+// 산업 카탈로그 톤: 카테고리는 색이 아니라 코드·아이콘·라벨로 구분한다.
+// (block/accent 는 단색으로 통일 — 파스텔 무지개 제거)
 export const CATEGORIES: CategoryMeta[] = [
   {
     name: "공기압축기",
     slug: "air-compressor",
     icon: Wind,
-    block: "bg-gradient-to-br from-sky-100 to-brand-100",
-    accent: "text-sky-700",
+    code: "AC",
+    block: "bg-brand-50",
+    accent: "text-brand-400",
     blurb: "스크류·피스톤·오일프리 등 현장 압축공기 솔루션",
   },
   {
     name: "모터·감속기",
     slug: "motor-gear",
     icon: Cog,
-    block: "bg-gradient-to-br from-amber-100 to-brand-100",
-    accent: "text-amber-700",
+    code: "MG",
+    block: "bg-brand-50",
+    accent: "text-brand-400",
     blurb: "구동·감속 설비를 위한 모터와 기어 제품",
   },
   {
     name: "밸브·유체제어",
     slug: "valve-fluid",
     icon: Gauge,
-    block: "bg-gradient-to-br from-emerald-100 to-brand-100",
-    accent: "text-emerald-700",
+    code: "VF",
+    block: "bg-brand-50",
+    accent: "text-brand-400",
     blurb: "유량·압력 제어를 위한 밸브와 액추에이터",
   },
   {
     name: "산업용 펌프",
     slug: "industrial-pump",
     icon: Droplets,
-    block: "bg-gradient-to-br from-cyan-100 to-brand-100",
-    accent: "text-cyan-700",
+    code: "IP",
+    block: "bg-brand-50",
+    accent: "text-brand-400",
     blurb: "이송·순환·가압을 위한 산업용 펌프",
   },
   {
     name: "센서·계측기",
     slug: "sensor-instrument",
     icon: Activity,
-    block: "bg-gradient-to-br from-violet-100 to-brand-100",
-    accent: "text-violet-700",
+    code: "SI",
+    block: "bg-brand-50",
+    accent: "text-brand-400",
     blurb: "공정 모니터링을 위한 센서와 계측 장비",
   },
 ];
@@ -75,8 +84,9 @@ const FALLBACK_CATEGORY: CategoryMeta = {
   name: "기타",
   slug: "etc",
   icon: Package,
-  block: "bg-gradient-to-br from-brand-100 to-brand-50",
-  accent: "text-brand-600",
+  code: "ET",
+  block: "bg-brand-50",
+  accent: "text-brand-400",
   blurb: "산업 현장용 장비",
 };
 

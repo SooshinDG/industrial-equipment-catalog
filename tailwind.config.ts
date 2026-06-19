@@ -8,6 +8,8 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // 웜화이트 종이 톤 — 페이지 바탕. 카드(흰색)와 미세한 대비를 만든다.
+        paper: "#faf9f6",
         brand: {
           50: "#f4f6f9",
           100: "#e6eaf1",
@@ -42,6 +44,14 @@ const config: Config = {
           "Apple SD Gothic Neo",
           "Malgun Gothic",
           "sans-serif",
+        ],
+        // 기술 정보(모델 코드·가격·수치 사양) 전용. 본문/제목에는 쓰지 않는다.
+        mono: [
+          "var(--font-mono)",
+          "ui-monospace",
+          "SFMono-Regular",
+          "Menlo",
+          "monospace",
         ],
       },
     },

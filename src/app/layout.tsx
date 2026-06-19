@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Noto_Sans_KR } from "next/font/google";
+import { Noto_Sans_KR, IBM_Plex_Mono } from "next/font/google";
 import { SITE } from "@/lib/site";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -9,6 +9,14 @@ const notoSansKr = Noto_Sans_KR({
   subsets: ["latin"],
   weight: ["400", "500", "700"],
   variable: "--font-sans",
+  display: "swap",
+});
+
+// 기술 데이터(모델명·코드·가격·수치)에만 제한적으로 사용하는 등폭 서체.
+const ibmPlexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-mono",
   display: "swap",
 });
 
@@ -44,8 +52,11 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ko" className={notoSansKr.variable}>
-      <body className="flex min-h-screen flex-col font-sans">
+    <html
+      lang="ko"
+      className={`${notoSansKr.variable} ${ibmPlexMono.variable}`}
+    >
+      <body className="flex min-h-screen flex-col bg-paper font-sans">
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-brand-800 focus:px-4 focus:py-2 focus:text-white"
