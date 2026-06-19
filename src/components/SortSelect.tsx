@@ -15,7 +15,7 @@ export function SortSelect({ query }: { query: CatalogQuery }) {
     <div className="flex items-center gap-2">
       <label
         htmlFor="sort-select"
-        className="whitespace-nowrap text-sm text-brand-500"
+        className="whitespace-nowrap text-xs font-medium text-brand-400"
       >
         정렬
       </label>
@@ -29,7 +29,7 @@ export function SortSelect({ query }: { query: CatalogQuery }) {
             scroll: false,
           });
         }}
-        className="rounded-md border border-brand-200 bg-white px-3 py-2 text-sm text-brand-700 focus:border-accent-400"
+        className="h-11 rounded-md border border-brand-300 bg-white pl-3 pr-8 text-sm font-medium text-brand-700 focus:border-accent-400"
       >
         {SORT_OPTIONS.map((option) => (
           <option key={option.value} value={option.value}>

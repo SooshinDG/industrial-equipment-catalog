@@ -34,8 +34,8 @@ export function ProductCard({ product }: { product: Product }) {
             <StockBadge status={product.stockStatus} />
           </div>
 
-          {/* 제품명 (최우선) */}
-          <h3 className="mt-2 text-[15px] font-semibold leading-snug text-brand-900">
+          {/* 제품명 (최우선) — 2줄 고정으로 카드 간 사양 시작선 정렬 */}
+          <h3 className="mt-2 line-clamp-2 min-h-[2.75rem] text-[15px] font-semibold leading-snug text-brand-900">
             {product.productName}
           </h3>
           {/* 제조사 · 모델 코드(mono) */}
