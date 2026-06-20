@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { SITE } from "@/lib/site";
@@ -169,11 +170,25 @@ export default async function HomePage() {
                   href={`/products/${lead.slug}`}
                   className="flex h-full flex-col sm:flex-row"
                 >
-                  <CategoryVisual
-                    category={lead.category}
-                    size="hero"
-                    className="h-40 w-full shrink-0 sm:h-auto sm:w-2/5"
-                  />
+                  {/* 대표 제품이 EQ-AC-001이면 실제 제품 이미지, 그 외에는 기존 기술 비주얼 */}
+                  {lead.productId === "EQ-AC-001" ? (
+                    <div className="relative min-h-[220px] w-full shrink-0 overflow-hidden border-b border-brand-200 bg-white sm:min-h-[260px] sm:w-2/5 sm:border-b-0 sm:border-r">
+                      <Image
+                        src="/images/products/screw-compressor-pro-100.png"
+                        alt={`${lead.productName} 제품 이미지`}
+                        fill
+                        priority
+                        sizes="(max-width: 768px) 100vw, 42vw"
+                        className="object-contain p-6 md:p-8"
+                      />
+                    </div>
+                  ) : (
+                    <CategoryVisual
+                      category={lead.category}
+                      size="hero"
+                      className="h-40 w-full shrink-0 sm:h-auto sm:w-2/5"
+                    />
+                  )}
                   <div className="flex flex-1 flex-col p-5">
                     <div className="flex items-center justify-between gap-2">
                       <span className="eyebrow">{lead.category}</span>
