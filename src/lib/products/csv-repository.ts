@@ -1,9 +1,17 @@
 import "server-only";
+
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { cache } from "react";
-import { parseCsvToRecords } from "./csv";
-import { STOCK_STATUSES, type Product, type StockStatus } from "./types";
+import { parseCsvToRecords } from "@/lib/csv";
+import { STOCK_STATUSES, type Product, type StockStatus } from "@/lib/types";
+import type { ProductRepository } from "./repository";
+import {
+  deriveCategoryCounts,
+  deriveFeatured,
+  deriveFilterFacets,
+  deriveRelated,
+} from "./derive";
 
 const CSV_PATH = path.join(process.cwd(), "data", "products.csv");
 
@@ -23,7 +31,7 @@ function isStockStatus(value: string): value is StockStatus {
 /** 개발 환경에서만 경고를 출력해 빌드/런타임을 막지 않는다. */
 function devWarn(message: string): void {
   if (process.env.NODE_ENV !== "production") {
-    console.warn(`[products] ${message}`);
+    console.warn(`[products:csv] ${message}`);
   }
 }
 
@@ -90,7 +98,7 @@ function validateRow(
 }
 
 /** CSV를 1회 읽어 파싱·검증한 결과를 요청 단위로 캐시한다. */
-export const getAllProducts = cache(async (): Promise<Product[]> => {
+const readCsvProducts = cache(async (): Promise<Product[]> => {
   const file = await readFile(CSV_PATH, "utf-8");
   const records = parseCsvToRecords(file);
 
@@ -115,54 +123,33 @@ export const getAllProducts = cache(async (): Promise<Product[]> => {
   return products;
 });
 
-export async function getProductBySlug(
-  slug: string,
-): Promise<Product | undefined> {
-  const products = await getAllProducts();
-  return products.find((p) => p.slug === slug);
-}
-
-export async function getFeaturedProducts(limit = 6): Promise<Product[]> {
-  const products = await getAllProducts();
-  const featured = products.filter((p) => p.featured);
-  const pool = featured.length >= limit ? featured : products;
-  return pool.slice(0, limit);
-}
-
-export async function getRelatedProducts(
-  product: Product,
-  limit = 4,
-): Promise<Product[]> {
-  const products = await getAllProducts();
-  return products
-    .filter((p) => p.category === product.category && p.slug !== product.slug)
-    .slice(0, limit);
-}
-
-/** 카테고리 목록과 각 카테고리의 제품 수 */
-export async function getCategoryCounts(): Promise<
-  { category: string; count: number }[]
-> {
-  const products = await getAllProducts();
-  const counts = new Map<string, number>();
-  for (const p of products) {
-    counts.set(p.category, (counts.get(p.category) ?? 0) + 1);
-  }
-  return Array.from(counts, ([category, count]) => ({ category, count }));
-}
-
-/** 필터 UI에 필요한 고유 값 집합 */
-export async function getFilterFacets(): Promise<{
-  categories: string[];
-  voltages: string[];
-  stockStatuses: StockStatus[];
-}> {
-  const products = await getAllProducts();
+/**
+ * 저장소 내 CSV 파일을 출처로 사용하는 repository.
+ * CSV에는 is_active 개념이 없으므로 모든 유효 행을 공개(active) 제품으로 취급한다.
+ */
+export function createCsvRepository(): ProductRepository {
   return {
-    categories: Array.from(new Set(products.map((p) => p.category))),
-    voltages: Array.from(new Set(products.map((p) => p.voltage))).sort(),
-    stockStatuses: STOCK_STATUSES.filter((s) =>
-      products.some((p) => p.stockStatus === s),
-    ),
+    async getActiveProducts() {
+      return readCsvProducts();
+    },
+    async getProductBySlug(slug) {
+      const products = await readCsvProducts();
+      return products.find((p) => p.slug === slug) ?? null;
+    },
+    async getFeaturedProducts(limit = 6) {
+      return deriveFeatured(await readCsvProducts(), limit);
+    },
+    async getRelatedProducts(product, limit = 4) {
+      return deriveRelated(await readCsvProducts(), product, limit);
+    },
+    async getCategoryCounts() {
+      return deriveCategoryCounts(await readCsvProducts());
+    },
+    async getCategories() {
+      return deriveCategoryCounts(await readCsvProducts()).map((c) => c.category);
+    },
+    async getFilterFacets() {
+      return deriveFilterFacets(await readCsvProducts());
+    },
   };
 }

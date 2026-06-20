@@ -16,13 +16,26 @@ import { FeaturedBadge, StockBadge } from "@/components/StockBadge";
 
 type Params = Promise<{ slug: string }>;
 
-// CSV가 유일한 데이터 소스이므로 빌드 시 모든 제품을 생성하고,
-// 목록에 없는 slug는 정식 404(not-found)로 처리한다.
-export const dynamicParams = false;
+// 현재 데이터 소스의 제품은 빌드 시 가능한 범위에서 정적 생성하고,
+// 관리자 업로드로 나중에 추가된 신규 slug는 재배포 없이 첫 요청에서 렌더한다.
+// (존재하지 않거나 is_active=false 인 slug는 페이지에서 notFound() 처리)
+export const dynamicParams = true;
 
 export async function generateStaticParams() {
-  const products = await getAllProducts();
-  return products.map((p) => ({ slug: p.slug }));
+  try {
+    const products = await getAllProducts();
+    return products.map((p) => ({ slug: p.slug }));
+  } catch (error) {
+    // 빌드 시 데이터 소스(예: 아직 시드되지 않은 Supabase)에 접근할 수 없어도
+    // 빌드를 깨뜨리지 않고, 모든 상세를 동적 렌더로 진행한다.
+    if (process.env.NODE_ENV !== "production") {
+      console.warn(
+        "[products/[slug]] generateStaticParams 실패 — 동적 렌더로 진행합니다:",
+        error,
+      );
+    }
+    return [];
+  }
 }
 
 export async function generateMetadata({
