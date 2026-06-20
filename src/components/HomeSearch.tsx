@@ -15,14 +15,14 @@ export function HomeSearch() {
   };
 
   return (
-    <form onSubmit={handleSubmit} role="search" className="w-full">
+    <form onSubmit={handleSubmit} role="search" className="w-full max-w-xl">
       <label htmlFor="home-search" className="sr-only">
         제품명, 모델, 용도, 제조사로 검색
       </label>
-      <div className="flex flex-col gap-2 sm:flex-row">
+      <div className="flex items-stretch">
         <div className="relative flex-1">
           <Search
-            className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-brand-300"
+            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-400"
             aria-hidden="true"
           />
           <input
@@ -31,10 +31,13 @@ export function HomeSearch() {
             value={value}
             onChange={(e) => setValue(e.target.value)}
             placeholder="예: 콤프레서, 펌프, 압력센서"
-            className="w-full rounded-md border border-brand-200 bg-white py-3 pl-11 pr-4 text-base text-brand-800 placeholder:text-brand-300 focus:border-accent-400"
+            className="h-11 w-full rounded-l-md border border-brand-300 bg-white pl-9 pr-3 text-sm text-brand-800 placeholder:text-brand-300 focus:z-10 focus:border-accent-400 [&::-webkit-search-cancel-button]:hidden"
           />
         </div>
-        <button type="submit" className="btn-primary py-3 sm:px-8">
+        <button
+          type="submit"
+          className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-r-md border border-accent-500 bg-accent-500 px-4 text-sm font-semibold text-brand-900 transition-colors hover:bg-accent-400"
+        >
           제품 검색
         </button>
       </div>

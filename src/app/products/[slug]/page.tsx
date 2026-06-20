@@ -8,11 +8,11 @@ import {
   getRelatedProducts,
 } from "@/lib/products";
 import { formatKrw, formatLeadTime, formatPower } from "@/lib/format";
+import { getCategoryMeta } from "@/lib/categories";
 import { SITE } from "@/lib/site";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { CategoryVisual } from "@/components/CategoryVisual";
 import { FeaturedBadge, StockBadge } from "@/components/StockBadge";
-import { ProductCard } from "@/components/ProductCard";
 
 type Params = Promise<{ slug: string }>;
 
@@ -64,20 +64,23 @@ export default async function ProductDetailPage({
   }
 
   const related = await getRelatedProducts(product, 4);
+  const meta = getCategoryMeta(product.category);
 
-  const specRows = [
+  // 사양 행 — mono 플래그로 수치/코드만 등폭 처리
+  const specRows: { label: string; value: string; mono?: boolean }[] = [
     { label: "카테고리", value: product.category },
     { label: "제조사", value: product.manufacturer },
-    { label: "모델", value: product.model },
-    { label: product.mainSpecLabel, value: product.mainSpecValue },
-    { label: product.subSpecLabel, value: product.subSpecValue },
-    { label: "전압", value: product.voltage },
-    { label: "정격 출력", value: formatPower(product.powerKw) },
+    { label: "모델", value: product.model, mono: true },
+    { label: "제품 코드", value: product.productId, mono: true },
+    { label: product.mainSpecLabel, value: product.mainSpecValue, mono: true },
+    { label: product.subSpecLabel, value: product.subSpecValue, mono: true },
+    { label: "전압", value: product.voltage, mono: true },
+    { label: "정격 출력", value: formatPower(product.powerKw), mono: true },
     { label: "인증", value: product.certification },
   ].filter((row) => row.label && row.value);
 
   return (
-    <div className="container-page py-8">
+    <div className="container-page py-8 pb-24 lg:pb-12">
       <Breadcrumbs
         items={[
           { label: "홈", href: "/" },
@@ -90,52 +93,44 @@ export default async function ProductDetailPage({
         ]}
       />
 
-      <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-2">
-        {/* 비주얼 */}
-        <div>
-          <CategoryVisual
-            category={product.category}
-            size="hero"
-            className="aspect-[4/3] w-full rounded-xl"
-          />
-        </div>
-
-        {/* 핵심 정보 */}
-        <div>
+      {/* 비대칭 2열: 좌측 기술 비주얼(작게) · 우측 핵심 정보(우세) */}
+      <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-12">
+        {/* 핵심 정보 — 모바일에서 먼저 노출 */}
+        <div className="order-1 lg:order-2 lg:col-span-7">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-sm font-medium text-brand-400">
-              {product.category}
-            </span>
+            <span className="eyebrow">{product.category}</span>
             {product.featured && <FeaturedBadge />}
             <StockBadge status={product.stockStatus} />
           </div>
 
-          <h1 className="mt-2 text-2xl font-bold text-brand-900 sm:text-3xl">
+          <h1 className="mt-2 text-2xl font-bold leading-tight text-brand-900 sm:text-3xl">
             {product.productName}
           </h1>
-          <p className="mt-1 text-sm text-brand-400">
-            {product.manufacturer} · 모델 {product.model}
+          <p className="mt-1 text-sm text-brand-500">
+            {product.manufacturer} · 모델{" "}
+            <span className="num text-brand-700">{product.model}</span>
           </p>
 
-          <p className="mt-4 text-3xl font-bold text-brand-900">
+          <p className="num mt-4 text-3xl font-bold text-brand-900">
             {formatKrw(product.priceKrw)}
           </p>
 
-          <dl className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div className="flex items-center gap-3 rounded-lg border border-brand-100 bg-brand-50 px-4 py-3">
-              <Clock className="h-5 w-5 text-brand-400" aria-hidden="true" />
+          {/* 핵심 사양 요약 — 괘선 분리 데이터 블록 */}
+          <dl className="mt-5 grid grid-cols-1 overflow-hidden rounded-sm border border-brand-200 sm:grid-cols-2">
+            <div className="flex items-center gap-3 border-b border-brand-200 px-4 py-3 sm:border-b-0 sm:border-r">
+              <Clock className="h-5 w-5 shrink-0 text-brand-400" aria-hidden="true" />
               <div>
                 <dt className="text-xs text-brand-400">예상 납기</dt>
-                <dd className="text-sm font-semibold text-brand-700">
+                <dd className="num text-sm font-semibold text-brand-800">
                   {formatLeadTime(product.leadTimeDays)}
                 </dd>
               </div>
             </div>
-            <div className="flex items-center gap-3 rounded-lg border border-brand-100 bg-brand-50 px-4 py-3">
-              <Zap className="h-5 w-5 text-brand-400" aria-hidden="true" />
+            <div className="flex items-center gap-3 px-4 py-3">
+              <Zap className="h-5 w-5 shrink-0 text-brand-400" aria-hidden="true" />
               <div>
                 <dt className="text-xs text-brand-400">전압 / 출력</dt>
-                <dd className="text-sm font-semibold text-brand-700">
+                <dd className="num text-sm font-semibold text-brand-800">
                   {product.voltage} · {formatPower(product.powerKw)}
                 </dd>
               </div>
@@ -158,33 +153,53 @@ export default async function ProductDetailPage({
           {product.certification && product.certification !== "해당 없음" && (
             <p className="mt-4 inline-flex items-center gap-1.5 text-sm text-brand-500">
               <FileCheck2 className="h-4 w-4" aria-hidden="true" />
-              인증: {product.certification}
+              인증: <span className="font-medium text-brand-700">{product.certification}</span>
             </p>
           )}
+        </div>
+
+        {/* 기술 비주얼 + 장비 라벨 플레이트 */}
+        <div className="order-2 lg:order-1 lg:col-span-5">
+          <div className="overflow-hidden rounded-sm border border-brand-200 bg-white">
+            <CategoryVisual
+              category={product.category}
+              size="hero"
+              className="aspect-[16/9] w-full sm:aspect-[4/3]"
+            />
+            <div className="flex items-center justify-between border-t border-brand-200 px-4 py-2.5">
+              <span className="num text-[11px] font-medium text-brand-500">
+                {meta.code}-{product.productId}
+              </span>
+              <span className="num text-[11px] text-brand-500">
+                모델 {product.model}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* 사양 + 용도/설명 */}
       <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-3">
         <section className="lg:col-span-2" aria-labelledby="spec-heading">
-          <h2 id="spec-heading" className="text-lg font-bold text-brand-800">
+          <h2 id="spec-heading" className="text-lg font-bold text-brand-900">
             주요 사양
           </h2>
-          <div className="mt-4 overflow-hidden rounded-lg border border-brand-100">
+          <div className="mt-4 overflow-hidden rounded-sm border border-brand-200">
             <table className="w-full text-sm">
               <tbody>
-                {specRows.map((row, idx) => (
-                  <tr
-                    key={row.label}
-                    className={idx % 2 === 0 ? "bg-white" : "bg-brand-50"}
-                  >
+                {specRows.map((row) => (
+                  <tr key={row.label} className="border-b border-brand-100 last:border-b-0">
                     <th
                       scope="row"
-                      className="w-40 border-b border-brand-100 px-4 py-3 text-left font-medium text-brand-500"
+                      className="w-36 bg-brand-50 px-4 py-2.5 text-left align-top font-medium text-brand-500 sm:w-44"
                     >
                       {row.label}
                     </th>
-                    <td className="border-b border-brand-100 px-4 py-3 text-brand-800">
+                    <td
+                      className={`px-4 py-2.5 text-brand-900 ${
+                        row.mono ? "num" : ""
+                      }`}
+                    >
                       {row.value}
                     </td>
                   </tr>
@@ -195,40 +210,90 @@ export default async function ProductDetailPage({
         </section>
 
         <section aria-labelledby="usecase-heading">
-          <h2 id="usecase-heading" className="text-lg font-bold text-brand-800">
+          <h2 id="usecase-heading" className="text-lg font-bold text-brand-900">
             용도 및 설명
           </h2>
-          <div className="mt-4 rounded-lg border border-brand-100 bg-white p-5">
+          <div className="mt-4 rounded-sm border border-brand-200 bg-white p-5">
             {product.useCase && (
-              <p className="text-sm font-semibold text-brand-700">
-                적용 분야: {product.useCase}
-              </p>
+              <>
+                <p className="eyebrow">적용 분야</p>
+                <p className="mt-0.5 text-sm font-semibold text-brand-800">
+                  {product.useCase}
+                </p>
+              </>
             )}
-            <p className="mt-2 text-sm leading-relaxed text-brand-500">
+            <p className="mt-3 text-sm leading-relaxed text-brand-500">
               {product.summary}
             </p>
           </div>
         </section>
       </div>
 
-      {/* 관련 제품 */}
+      {/* 관련 제품 — 비교용 컴팩트 기술 목록 */}
       {related.length > 0 && (
         <section className="mt-14" aria-labelledby="related-heading">
-          <h2
-            id="related-heading"
-            className="text-lg font-bold text-brand-800"
-          >
+          <h2 id="related-heading" className="text-lg font-bold text-brand-900">
             같은 카테고리 추천 제품
           </h2>
-          <ul className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {related.map((item) => (
-              <li key={item.productId}>
-                <ProductCard product={item} />
-              </li>
-            ))}
+          <ul className="mt-4 divide-y divide-brand-200 overflow-hidden rounded-sm border border-brand-200 bg-white">
+            {related.map((item) => {
+              const spec =
+                item.mainSpecValue &&
+                `${item.mainSpecLabel} ${item.mainSpecValue}`;
+              return (
+                <li key={item.productId}>
+                  <Link
+                    href={`/products/${item.slug}`}
+                    className="flex items-center gap-4 px-4 py-3 transition-colors hover:bg-brand-50"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-semibold text-brand-900">
+                        {item.productName}
+                      </p>
+                      <p className="mt-0.5 truncate text-xs text-brand-500">
+                        <span className="num">{item.model}</span>
+                        {spec && (
+                          <>
+                            {" · "}
+                            <span className="num">{spec}</span>
+                          </>
+                        )}
+                      </p>
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <p className="num text-sm font-semibold text-brand-900">
+                        {formatKrw(item.priceKrw)}
+                      </p>
+                      <p className="num mt-0.5 text-[11px] text-brand-400">
+                        {formatLeadTime(item.leadTimeDays)}
+                      </p>
+                    </div>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </section>
       )}
+
+      {/* 모바일 하단 sticky 문의 — 콘텐츠는 pb-24로 확보 */}
+      <div className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-between gap-3 border-t border-brand-200 bg-paper/95 px-4 py-2.5 backdrop-blur lg:hidden">
+        <div className="min-w-0">
+          <p className="num text-base font-bold leading-tight text-brand-900">
+            {formatKrw(product.priceKrw)}
+          </p>
+          <p className="num truncate text-[11px] text-brand-400">
+            {product.stockStatus} · {formatLeadTime(product.leadTimeDays)}
+          </p>
+        </div>
+        <Link
+          href={`/inquiry?product=${encodeURIComponent(product.slug)}`}
+          className="btn-primary shrink-0"
+        >
+          <MessageSquare className="h-4 w-4" aria-hidden="true" />
+          견적 문의
+        </Link>
+      </div>
     </div>
   );
 }
