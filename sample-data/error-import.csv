@@ -1,0 +1,4 @@
+product_id,slug,product_name,category,manufacturer,model,price_krw,stock_status,featured
+EQ-AC-002,ac-002-ac-974a,소형 피스톤 콤프레서 MAX-120,공기압축기,에어메이트,AC-974A,-100,재고 있음,true
+EQ-AC-002,dup-slug-001,중복 product_id 행,공기압축기,에어메이트,AC-974A,1000000,재고 있음,maybe
+TEST-ERR-001,test-err-001,잘못된 값 행,공기압축기,데모테크,T-ERR,abc,없는상태,false
