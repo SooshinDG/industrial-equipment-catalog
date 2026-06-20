@@ -168,7 +168,7 @@ export default async function ProductDetailPage({
             />
             <div className="flex items-center justify-between border-t border-brand-200 px-4 py-2.5">
               <span className="num text-[11px] font-medium text-brand-500">
-                {meta.code}-{product.productId}
+                {meta.code} / {product.productId}
               </span>
               <span className="num text-[11px] text-brand-500">
                 모델 {product.model}
